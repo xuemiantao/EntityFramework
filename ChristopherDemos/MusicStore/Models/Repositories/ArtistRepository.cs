@@ -13,5 +13,18 @@ namespace MusicStore.Models.Repositories
 			return DbSet.Where(a => a.Name.Contains(name)).ToList();
 		}
 
+		public override void Update(Artist entity)
+		{
+			base.Update(entity);
+			SaveChanges();
+			entity.Version++;
+			base.Update(entity);
+			SaveChanges();
+		}
+
+		public List<SoloArtist> GetSoloArtists()
+		{
+			return DbSet.OfType<SoloArtist>().ToList();
+		}
 	}
 }

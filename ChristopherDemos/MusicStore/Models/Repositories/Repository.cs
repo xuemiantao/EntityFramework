@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace MusicStore.Models.Repositories
 {
-	public class Repository<T> where T : class
+	public class Repository<T> : IDisposable where T : class
 	{
+		private bool disposed = false;
 		private MusicStoreDataContext context = null;
 
 		protected DbSet<T> DbSet
@@ -41,9 +42,27 @@ namespace MusicStore.Models.Repositories
 			DbSet.Add(entity);
 		}
 
+		public virtual void Update(T entity)
+		{
+			context.Entry<T>(entity).State = EntityState.Modified;
+		}
+
+		public void Delete(int id)
+		{
+			DbSet.Remove(DbSet.Find(id));
+		}
+
 		public void SaveChanges()
 		{
 			context.SaveChanges();
+		}
+
+		public void Dispose()
+		{
+			if(!disposed) {
+				context.Dispose();
+				disposed = true;
+			}
 		}
 	}
 }
