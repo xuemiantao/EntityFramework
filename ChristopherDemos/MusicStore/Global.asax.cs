@@ -14,7 +14,7 @@ namespace MusicStore
     {
         protected void Application_Start()
         {
-			Database.SetInitializer<MusicStoreDataContext>(new MusicStoreDataContextInitializer());
+			//Database.SetInitializer<MusicStoreDataContext>(new MusicStoreDataContextInitializer());
 
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
