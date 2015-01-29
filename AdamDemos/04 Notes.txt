@@ -1,0 +1,90 @@
+** Fluent API Basics **
+
+protected override void OnModelCreating(DbModelBuilder modelBuilder)
+{
+   modelBuilder.HasDefaultSchema("MusicStore");
+
+
+   modelBuilder.Entity<Album>().HasKey(t => t.AlbumId);
+
+   modelBuilder.Entity<Album>().Property(t => t.Title).IsUnicode(false);
+
+   modelBuilder.Entity<Album>()
+                .HasRequired<Artist>(s => s.Artist)
+                .WithMany(s => s.Albums);
+}
+
+
+//composite
+modelBuilder.Entity<Album>()
+           .HasKey(t => new { t.AlbumId, t.GenreId });
+
+--We'll specify key, no autogen
+modelBuilder.Entity<Album>()
+          .Property(t => t.AlbumId)
+          .HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
+
+
+changing guid?
+modelBuilder.Entity<Album>().Property(o=>o.AlbumId).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+
+
+One To One
+// Configure the primary key for the OfficeAssignment 
+            modelBuilder.Entity<AlbumDetail>().HasKey(t => t.AlbumId);
+
+            modelBuilder.Entity<Album>()
+                .HasOptional(t => t.AlbumDetail)
+                .WithRequired(t => t.Album);
+
+    public class Album
+    {
+        public Guid AlbumId { get; set; }
+        public string Title { get; set; }
+        public decimal Price { get; set; }
+        public AlbumDetail AlbumDetail { get; set; }
+    }
+
+    public class AlbumDetail
+    {
+        public string Description { get; set; }
+        public int AlbumId { get; set; }
+        public Album Album { get; set; }
+
+    }
+
+
+** Fluent API Remapping tables and columns ** 
+
+public MusicContext()
+{
+            Database.SetInitializer(new DropCreateDatabaseAlways<MusicContext>());
+}
+
+protected override void OnModelCreating(DbModelBuilder modelBuilder)
+{
+            modelBuilder.Entity<Album>().ToTable("AlbumInfo", "dbo");
+            modelBuilder.Entity<Album>().Property(e => e.Title).HasColumnName("Album_Title");
+}
+
+
+
+** Setting up migrations **
+Enable-migrations 
+Talk about the initial state. The database is created (review of first module) Problem. How do we script this database?
+Script initial database update-database –script –targetmigration $InitialDatabase
+Add new migration(s)
+
+Generate down script: update-database -script -SourceMigration XXXXX –TargetMigration InitialCreate
+
+*** Customizing Migrations ***
+Add a decimal Cost field to Album class
+Add-migration AlbumCost
+Customize
+    public class Album
+    {
+        public int AlbumId { get; set; }
+        public string Title { get; set; }
+    }
+
+ Price = c.Decimal(nullable: false, precision: 18, scale: 2, defaultValue:9.99m),

@@ -1,0 +1,74 @@
+**Installing **
+Create MVC app without identity, Install-package entityframework
+Create MVC app with identity, note it already exists. 
+
+update-package entity-framework (optionally use -pre flag for prerelease)
+
+uninstall-package entityframework
+
+
+**Basic code first / scaffolding**
+
+Create a new console app, then we’ll do web.
+Install-package EF
+Add classes below
+Run the app. Note database is created 
+
+
+public class Album
+{
+        public int AlbumId { get; set; }
+        public string Title { get; set; }
+        public decimal Price { get; set; }
+}
+
+ public class MusicContext : DbContext
+{
+        public DbSet<Album> Albums { get; set; }
+}
+
+
+Querying this is simple
+using (var context = new MusicContext())
+{
+                var albums = context.Albums.ToList();
+                Console.WriteLine(albums.Count());
+
+                context.Albums.Add(new Album() { AlbumArtUrl="http://no.com",
+                AlbumId=1,
+                ArtistId=1,
+                GenreId=2,
+                Price=9.99m,
+                Title="My Album"});
+
+                context.SaveChanges();
+
+                
+                albums = context.Albums.ToList();
+                Console.WriteLine(albums.Count());
+                
+}
+
+
+
+
+***LOGGING ***
+//View queries
+context.Database.Log = s => Console.WriteLine(s);
+
+//Log connection
+Console.WriteLine(context.Database.Connection.ConnectionString);
+
+Using glimpse
+Install-package glimpse.mvc5
+install-package glimpse.ef6
+
+Inside the <entityFramework> element
+<interceptors>
+  <interceptor type="System.Data.Entity.Infrastructure.Interception.DatabaseLogger, EntityFramework">
+    <parameters>
+      <parameter value="MyAppsOutput.txt"/>
+      <parameter value="true" type="System.Boolean"/>
+    </parameters>
+  </interceptor>
+</interceptors>

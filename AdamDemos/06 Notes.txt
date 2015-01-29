@@ -1,0 +1,39 @@
+*** Stored procs ***
+
+All of these go inside 
+ protected override void OnModelCreating(DbModelBuilder modelBuilder)
+
+//will generate all procs
+modelBuilder.Entity<Album>().MapToStoredProcedures();
+
+//override the proc names
+modelBuilder.Entity<Album>().MapToStoredProcedures(o=>o.Insert(p=>p.HasName("Proc_InsertAbum"))
+                                                                .Insert(i=>i.HasName("Proc_UpdateAlbum"))
+                                                               .Delete(q=>q.HasName("Proc_DeleteAlbum")));
+
+//let's get a return value after inserting. This will generate a proc that inserts an album and returns id
+modelBuilder.Entity<Album>().MapToStoredProcedures(o => o.Insert(proc => proc.HasName("Proc_InsertAlbum").Result(p => p.AlbumId,"id")));
+
+
+*** Async **
+You can scaffold a model class out in Visual Studio (as shown in the demos multiple times), and in 
+the scaffold dialog you have an option to create Async controller methods which in turn call Async context methods (like ToListAsync, SaveChangesAsync, etc)
+
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<ActionResult> Create([Bind(Include = "AlbumId,GenreId,ArtistId,Title,Price,AlbumArtUrl")] Album album)
+{
+            if (ModelState.IsValid)
+            {
+                db.Albums.Add(album);
+                await db.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+
+            return View(album);
+}
+
+
+*** Concurrency ***
+Need to add this action filter \HandleConcurrencyExceptionFilter.cs in this folder into the project
+See demo project.
