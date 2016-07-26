@@ -39,6 +39,7 @@ namespace Guid_Primary_Key_Demo
     public class Album
     {
         /// <summary>
+        ///Jusa a Comment!!!
         /// You'll notice when we do an update-database -script the sql that is generated contains
         /// the code to generate a new Guid upon insert
         /// CREATE TABLE [dbo].[Albums] (
